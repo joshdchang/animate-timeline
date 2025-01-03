@@ -177,5 +177,5 @@ dist
 frames
 text-frames
 *.mp4
-*.json
+location-data.json
 
