@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { promise, z } from "zod";
 import { encode } from "@googlemaps/polyline-codec";
 import sharp from "sharp";
 import fs from "fs/promises";
@@ -109,12 +109,10 @@ smoothZooms(frames, 168, 15.0);
 console.log("Smoothed zoom values");
 
 // build url for each frame
-const accessToken =
-  "pk.eyJ1Ijoiam9zaGNoYW5nMDQiLCJhIjoiY2p3c2c5NDdsMDEyOTQwcXhyc245eTYwcSJ9.CKHrw2ddbsyG9bdOlr0TvQ";
 const stroke = "ff0000";
 const weight = 3;
 
-console.log("Generated image URLs");
+console.log("Generating image URLs...");
 const images = frames.map((frame, index) => {
   const [latCenter, lngCenter] = frame.center;
   return {
@@ -124,7 +122,7 @@ const images = frames.map((frame, index) => {
       )
       .join(",")}/${lngCenter},${latCenter},${
       frame.zoom
-    },0/${width}x${height}@2x?access_token=${accessToken}`,
+    },0/${width}x${height}@2x?access_token=${mapboxAccessToken}`,
     index,
   };
 });
@@ -132,18 +130,14 @@ console.log("Generated image URLs");
 
 // fetch & save
 console.log("Fetching and saving frames...");
-for (const { url, index } of images) {
-  // console.log(`Fetching frame ${index} at ${url}`);
-  fetch(url)
-    .then((res) => res.arrayBuffer())
-    .then((buffer) => {
-      Bun.write(`./frames/frame-${index}.png`, buffer);
-      console.log(`Frame ${index} saved`);
-    })
-    .catch((error) => {
-      console.error(`Error fetching frame ${index}:`, error);
-    });
-}
+await Promise.all(
+  images.map(async ({ url, index }) => {
+    const res = await fetch(url);
+    const buffer = await res.arrayBuffer();
+    await Bun.write(`./frames/frame-${index}.png`, buffer);
+    console.log(`Frame ${index} saved`);
+  })
+);
 console.log("All frames saved");
 
 // add labels
