@@ -1,10 +1,8 @@
 # animate-timeline
 
-## Description
-
 This project generates an animated video of your location history from a Google Maps Timeline JSON file.
 
-## Instructions
+## Usage
 
 Clone this repository:
 

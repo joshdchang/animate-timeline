@@ -144,49 +144,50 @@ console.log("All frames saved");
 console.log("Adding date labels to frames...");
 const framesFiles = await fs.readdir("frames");
 
-for (const frameFile of framesFiles) {
-  const framePath = `frames/${frameFile}`;
-  const frameImage = sharp(framePath);
+await Promise.all(
+  framesFiles.map(async (frameFile) => {
+    const framePath = `frames/${frameFile}`;
+    const frameImage = sharp(framePath);
 
-  const frameNumber = parseInt(frameFile.split("_")[1].split(".")[0]);
+    const frameNumber = parseInt(frameFile.split("_")[1].split(".")[0]);
 
-  // every frame is one hour offset from the previous one, starting at animationStart
-  const timestamp = animationStart.getTime() + frameNumber * 60 * 60 * 1000;
-  const dateString = new Date(timestamp).toLocaleDateString("en-US", {
-    timeZone: "UTC",
-    month: "short",
-    day: "numeric",
-  });
+    // every frame is one hour offset from the previous one, starting at animationStart
+    const timestamp = animationStart.getTime() + frameNumber * 60 * 60 * 1000;
+    const dateString = new Date(timestamp).toLocaleDateString("en-US", {
+      timeZone: "UTC",
+      month: "short",
+      day: "numeric",
+    });
 
-  const frameWithText = frameImage.composite([
-    {
-      input: "box.png",
-      gravity: "northwest",
-    },
-    {
-      input: {
-        text: {
-          text: `<span background='white' foreground='black'>${dateString}</span>`,
-          dpi: 300,
-          rgba: true,
-        },
+    const frameWithText = frameImage.composite([
+      {
+        input: "box.png",
+        gravity: "northwest",
       },
-      blend: "darken",
-      gravity: "northwest",
-      left: 40,
-      top: 30,
-    },
-  ]);
+      {
+        input: {
+          text: {
+            text: `<span background='white' foreground='black'>${dateString}</span>`,
+            dpi: 300,
+            rgba: true,
+          },
+        },
+        blend: "darken",
+        gravity: "northwest",
+        left: 40,
+        top: 30,
+      },
+    ]);
 
-  frameWithText.toFile(`labelled_frames/${frameFile}`).then(() => {
+    await frameWithText.toFile(`labelled_frames/${frameFile}`);
     console.log(`Added label to frame ${frameNumber}`);
-  });
-}
+  })
+);
 console.log("All labels added");
 
 // create the video
 console.log("Creating video...");
-Bun.$`ffmpeg -r 30 -f image2 -s ${width * 2}x${
+await Bun.$`ffmpeg -r 30 -f image2 -s ${width * 2}x${
   height * 2
 } -start_number 1 -i labelled_frames/frame_%d.png -vframes ${
   frames.length - 1
