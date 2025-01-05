@@ -1,4 +1,4 @@
-import { promise, z } from "zod";
+import { z } from "zod";
 import { encode } from "@googlemaps/polyline-codec";
 import sharp from "sharp";
 import fs from "fs/promises";
@@ -17,11 +17,13 @@ type Frame = {
 };
 
 // animation config
-const animationStart = new Date("2024-01-01T00:00:00Z");
+const animationStart = new Date("2018-03-20T00:00:00Z");
 const animationEnd = new Date("2025-01-01T00:00:00Z");
 
 const width = 1200;
 const height = 800;
+
+const showYear = true;
 
 // get the data path from the command line args
 const dataPath = Bun.argv[2];
@@ -157,24 +159,25 @@ await Promise.all(
       timeZone: "UTC",
       month: "short",
       day: "numeric",
+      year: showYear ? "numeric" : undefined,
     });
 
     const frameWithText = frameImage.composite([
       {
-        input: "box.png",
+        input: showYear ? "label_box_wide.png" : "label_box.png",
         gravity: "northwest",
       },
       {
         input: {
           text: {
             text: `<span background='white' foreground='black'>${dateString}</span>`,
-            dpi: 300,
+            dpi: showYear ? 200 : 300,
             rgba: true,
           },
         },
         blend: "darken",
         gravity: "northwest",
-        left: 40,
+        left: 36,
         top: 30,
       },
     ]);
