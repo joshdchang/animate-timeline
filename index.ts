@@ -26,7 +26,7 @@ const height = 800;
 // get the data path from the command line args
 const dataPath = Bun.argv[2];
 if (!dataPath) {
-  console.error("Usage: bun run plot.ts <location-history.json>");
+  console.error("Usage: bun run index.ts <location-history.json>");
   process.exit(1);
 }
 
@@ -134,7 +134,7 @@ await Promise.all(
   images.map(async ({ url, index }) => {
     const res = await fetch(url);
     const buffer = await res.arrayBuffer();
-    await Bun.write(`./frames/frame-${index}.png`, buffer);
+    await Bun.write(`./frames/frame_${index}.png`, buffer);
     console.log(`Frame ${index} saved`);
   })
 );
