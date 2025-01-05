@@ -17,13 +17,13 @@ type Frame = {
 };
 
 // animation config
-const animationStart = new Date("2018-03-20T00:00:00Z");
+const animationStart = new Date("2024-01-01T00:00:00Z");
 const animationEnd = new Date("2025-01-01T00:00:00Z");
 
 const width = 1200;
 const height = 800;
 
-const showYear = true;
+const showYear = false;
 
 // get the data path from the command line args
 const dataPath = Bun.argv[2];
