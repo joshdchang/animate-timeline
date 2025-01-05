@@ -178,4 +178,5 @@ frames
 text-frames
 *.mp4
 location-data.json
+location-history.json
 

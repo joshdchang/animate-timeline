@@ -26,11 +26,19 @@ const height = 800;
 // get the data path from the command line args
 const dataPath = Bun.argv[2];
 if (!dataPath) {
-  console.error("Usage: bun run plot.ts <data.json>");
+  console.error("Usage: bun run plot.ts <location-history.json>");
+  process.exit(1);
+}
+
+// get mapbox access token from env
+const mapboxAccessToken = Bun.env.MAPBOX_ACCESS_TOKEN;
+if (!mapboxAccessToken) {
+  console.error("Please set the MAPBOX_ACCESS_TOKEN environment variable");
   process.exit(1);
 }
 
 // check that ffmpeg is installed
+console.log("Checking for ffmpeg...");
 const ffmpegInstalled = await Bun.$`ffmpeg -version`;
 if (ffmpegInstalled.exitCode !== 0) {
   console.error("ffmpeg is not installed. Please install it and try again.");
