@@ -175,7 +175,7 @@ dist
 .DS_Store
 
 frames
-text-frames
+labelled_frames
 *.mp4
 location-data.json
 location-history.json
